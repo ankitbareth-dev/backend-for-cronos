@@ -6,7 +6,9 @@ import morgan from "morgan";
 
 import { errorHandler } from "./middlewares/globalErrorHandler";
 import { sanitizeInput } from "./middlewares/sanitizeInput";
-import { globalLimiter } from "./middlewares/rateLimiter";
+import { globalLimiter, authLimiter } from "./middlewares/rateLimiter";
+
+import authRoutes from "./routes/auth.routes";
 
 const app: Application = express();
 
@@ -30,6 +32,9 @@ app.get("/", (req: Request, res: Response) => {
     message: "Server is running",
   });
 });
+
+app.use("/api/auth", authLimiter, authRoutes);
+
 app.use((req: Request, res: Response) => {
   res.status(404).json({
     success: false,
