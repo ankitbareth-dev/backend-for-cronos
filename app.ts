@@ -10,6 +10,8 @@ import { globalLimiter } from "./middlewares/rateLimiter";
 
 const app: Application = express();
 
+app.disable("x-powered-by");
+
 app.use(morgan("dev"));
 
 app.use(express.json({ limit: "1mb" }));
