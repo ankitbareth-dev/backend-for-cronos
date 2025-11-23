@@ -11,20 +11,26 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
+    "@prisma/client": "^7.0.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-rate-limit": "^8.2.1",
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
+    "prisma": "^7.0.0",
     "sanitize-html": "^2.17.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
     "@types/hpp": "^0.2.7",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.10.1",
     "@types/sanitize-html": "^2.16.0",
