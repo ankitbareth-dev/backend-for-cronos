@@ -4,7 +4,8 @@ import helmet from "helmet";
 import hpp from "hpp";
 
 import { errorHandler } from "./middlewares/globalErrorHandler";
-import { sanitizeInput } from "middlewares/sanitizeInput";
+import { sanitizeInput } from "./middlewares/sanitizeInput";
+import { globalLimiter } from "./middlewares/rateLimiter";
 
 const app: Application = express();
 
@@ -16,6 +17,8 @@ app.use(helmet());
 app.use(hpp());
 
 app.use(sanitizeInput);
+
+app.use(globalLimiter);
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
