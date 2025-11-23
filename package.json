@@ -4,10 +4,11 @@
   "description": "a try",
   "license": "ISC",
   "author": "ankit",
-  "type": "module",
-  "main": "server.ts",
+  "main": "dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "dependencies": {
     "express": "^5.1.0"
