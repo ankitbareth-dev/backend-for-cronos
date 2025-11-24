@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import * as authService from "../services/auth.service";
 import { catchAsync } from "../utils/catchAsync";
-import { AppError } from "../utils/AppError";
 
 export const signup = catchAsync(async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -15,11 +14,10 @@ export const signup = catchAsync(async (req: Request, res: Response) => {
       user,
     });
   } catch (error: any) {
-    // Use AppError for known operational errors
-    if (error.message.includes("exists")) {
-      throw new AppError(error.message, 400);
+    if (error?.message?.includes("exists")) {
+      error.status = 400;
     }
-    // Otherwise, let it be caught by global error handler
+
     throw error;
   }
 });
@@ -36,7 +34,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
       user,
     });
   } catch (error: any) {
-    // Known auth error
-    throw new AppError(error.message || "Invalid credentials", 400);
+    error.status = 400;
+    throw error;
   }
 });

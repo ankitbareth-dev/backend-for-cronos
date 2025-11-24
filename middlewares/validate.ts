@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ZodType } from "zod";
+import { ZodError, ZodType } from "zod";
 
 export const validate = (schema: ZodType) => {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -9,12 +9,27 @@ export const validate = (schema: ZodType) => {
         query: req.query,
         params: req.params,
       });
+
       next();
-    } catch (error: any) {
-      return res.status(400).json({
-        success: false,
-        errors: error.errors,
-      });
+    } catch (err: any) {
+      if (err instanceof ZodError) {
+        const formatted: Record<string, string> = {};
+
+        err.issues.forEach((issue) => {
+          const field = issue.path[1];
+
+          if (typeof field === "string") {
+            formatted[field] = issue.message;
+          }
+        });
+
+        return res.status(400).json({
+          success: false,
+          errors: formatted,
+        });
+      }
+
+      next(err);
     }
   };
 };

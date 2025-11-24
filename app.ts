@@ -27,9 +27,9 @@ app.use(sanitizeInput);
 
 app.use(globalLimiter);
 
-app.get("/", (req: Request, res: Response) => {
+app.post("/", (req: Request, res: Response) => {
   res.status(200).json({
-    message: "Server is running",
+    message: "Api is running",
   });
 });
 
