@@ -16,10 +16,18 @@ export const validate = (schema: ZodType) => {
         const formatted: Record<string, string> = {};
 
         err.issues.forEach((issue) => {
-          const field = issue.path[1];
-
-          if (typeof field === "string") {
-            formatted[field] = issue.message;
+          if (issue.code === "unrecognized_keys") {
+            issue.keys.forEach((key) => {
+              formatted[key] = "This field is not allowed";
+            });
+          } else if (issue.path.length > 1) {
+            const field = issue.path[1];
+            if (typeof field === "string") {
+              formatted[field] = issue.message;
+            }
+          } else if (issue.path.length === 1) {
+            const field = issue.path[0];
+            if (typeof field === "string") formatted[field] = issue.message;
           }
         });
 
