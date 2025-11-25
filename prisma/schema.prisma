@@ -8,9 +8,60 @@ generator client {
 }
 
 model User {
+  id         String        @id @default(uuid())
+  name       String
+  email      String        @unique
+  password   String
+  createdAt  DateTime      @default(now())
+
+  // Relations
+  matrices   TimeMatrix[]
+  categories Category[]
+  profile    UserProfile?
+}
+
+model UserProfile {
   id        String   @id @default(uuid())
+  bio       String?
+  avatarUrl String?
+  theme     String? 
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String  @unique
+}
+
+model TimeMatrix {
+  id          String        @id @default(uuid())
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  startTime   String        
+  endTime     String        
+  interval    Int           
+  createdAt   DateTime      @default(now())
+
+  user        User          @relation(fields: [userId], references: [id])
+  userId      String
+
+  cells       MatrixCell[]
+}
+
+model MatrixCell {
+  id         String      @id @default(uuid())
+  dayIndex   Int         
+  startTime  String      
+  endTime    String      
+  color      String      
+
+  matrix     TimeMatrix  @relation(fields: [matrixId], references: [id])
+  matrixId   String
+}
+
+model Category {
+  id        String    @id @default(uuid())
   name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  color     String?   
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
 }
