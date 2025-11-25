@@ -12,6 +12,7 @@ import { handleMalformedJson } from "./middlewares/handleMalformedJson";
 import { emptyBodyHandler } from "./middlewares/emptyBodyHandler";
 
 import authRoutes from "./routes/auth.routes";
+import profileRoutes from "./routes/updateProfile.routes";
 
 const app: Application = express();
 
@@ -42,6 +43,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/profile", profileRoutes);
 
 app.use(unknownRouteHandler);
 
