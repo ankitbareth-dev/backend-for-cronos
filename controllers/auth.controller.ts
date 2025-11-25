@@ -6,12 +6,11 @@ export const signup = catchAsync(async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
 
   try {
-    const user = await authService.registerUser(name, email, password);
+    await authService.registerUser(name, email, password);
 
     res.status(201).json({
       success: true,
       message: "User registered successfully",
-      user,
     });
   } catch (error: any) {
     if (error?.message?.includes("exists")) {
@@ -31,7 +30,11 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       token,
-      user,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
     });
   } catch (error: any) {
     error.status = 400;
