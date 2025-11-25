@@ -1,8 +1,10 @@
 import { z } from "zod";
 
 export const updateUserSchema = z.object({
-  name: z.string().min(2).optional(),
-  email: z.string().email().optional(),
-  oldPassword: z.string().min(6).optional(),
-  newPassword: z.string().min(6).optional(),
+  body: z.object({
+    name: z.string().min(2).optional(),
+    email: z.string().pipe(z.email()).optional(),
+    oldPassword: z.string().optional(),
+    newPassword: z.string().optional(),
+  }),
 });
