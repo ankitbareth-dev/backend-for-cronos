@@ -3,7 +3,7 @@ import * as userService from "../services/user.service";
 import { catchAsync } from "../utils/catchAsync";
 
 export const updateUser = catchAsync(async (req: Request, res: Response) => {
-  const userId = req.user.id;
+  const userId = req.user!.id;
   const { name, email, oldPassword, newPassword } = req.body;
 
   const updatedUser = await userService.updateUser(
