@@ -13,6 +13,7 @@ import { emptyBodyHandler } from "./middlewares/emptyBodyHandler";
 
 import authRoutes from "./routes/auth.routes";
 import profileRoutes from "./routes/updateProfile.routes";
+import matrixRoutes from "./routes/matrix.routes";
 
 const app: Application = express();
 
@@ -44,6 +45,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/matrix", matrixRoutes);
 
 app.use(unknownRouteHandler);
 
