@@ -15,6 +15,7 @@ import authRoutes from "./routes/auth.routes";
 import profileRoutes from "./routes/updateProfile.routes";
 import matrixRoutes from "./routes/matrix.routes";
 import cellRoutes from "./routes/cell.routes";
+import categoryRoutes from "./routes/category.routes";
 
 const app: Application = express();
 
@@ -48,6 +49,7 @@ app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/matrix", matrixRoutes);
 app.use("/api/cell", cellRoutes);
+app.use("/api/category", categoryRoutes);
 
 app.use(unknownRouteHandler);
 

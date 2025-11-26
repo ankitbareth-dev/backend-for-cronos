@@ -41,3 +41,10 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     throw error;
   }
 });
+
+export const logout = async (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+};
