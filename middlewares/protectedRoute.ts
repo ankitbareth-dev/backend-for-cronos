@@ -6,27 +6,21 @@ export const protectedRoute = (
   res: Response,
   next: NextFunction
 ) => {
-  let token: string | undefined;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer ")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-  }
-
-  if (!token) {
-    const error: any = new Error("Not authorized");
-    error.status = 401;
-    return next(error);
-  }
-
   try {
+    const token = req.cookies?.token;
+
+    if (!token) {
+      const error: any = new Error("Not authorized");
+      error.status = 401;
+      return next(error);
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+
     req.user = decoded;
     next();
   } catch (err) {
-    const error: any = new Error("Invalid token");
+    const error: any = new Error("Invalid or expired token");
     error.status = 401;
     return next(error);
   }
