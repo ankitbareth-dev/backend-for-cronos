@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import hpp from "hpp";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 import { errorHandler } from "./middlewares/globalErrorHandler";
 import { sanitizeInput } from "./middlewares/sanitizeInput";
@@ -30,6 +31,8 @@ app.use(handleMalformedJson);
 app.use(emptyBodyHandler);
 
 app.use(express.urlencoded({ limit: "1mb", extended: true }));
+
+app.use(cookieParser());
 
 app.use(cors());
 app.use(helmet());
