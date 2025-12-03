@@ -27,9 +27,17 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   try {
     const { user, token } = await authService.loginUser(email, password);
 
-    res.status(200).json({
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
       success: true,
-      token,
+      message: "Login successful",
       user: {
         id: user.id,
         name: user.name,
