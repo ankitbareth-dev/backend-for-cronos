@@ -50,6 +50,13 @@ export const login = catchAsync(async (req: Request, res: Response) => {
   }
 });
 
+export const checkAuth = (req: Request & { user?: any }, res: Response) => {
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+};
+
 export const logout = async (req: Request, res: Response) => {
   res.clearCookie("token", {
     httpOnly: true,
