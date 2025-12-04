@@ -16,6 +16,6 @@ router.get("/check-auth", protectedRoute, checkAuth);
 router.post("/signup", validate(signupSchema), signup);
 router.post("/login", validate(loginSchema), login);
 
-router.post("/logout", protectedRoute, logout);
+router.get("/logout", logout);
 
 export default router;
