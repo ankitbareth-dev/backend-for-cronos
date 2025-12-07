@@ -11,7 +11,12 @@ export const matrixService = {
   create(userId: string, data: any) {
     return prisma.timeMatrix.create({
       data: {
-        ...data,
+        name: data.name,
+        startDate: new Date(data.startDate).toISOString(),
+        endDate: new Date(data.endDate).toISOString(),
+        startTime: data.startTime,
+        endTime: data.endTime,
+        interval: data.interval,
         userId,
       },
     });
