@@ -57,8 +57,8 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/matrix", matrixRoutes);
-app.use("/api/cell", cellRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/cell", cellRoutes);
 
 app.use(unknownRouteHandler);
 
