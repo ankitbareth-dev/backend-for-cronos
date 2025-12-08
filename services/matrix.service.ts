@@ -4,7 +4,6 @@ export const matrixService = {
   getAll(userId: string) {
     return prisma.timeMatrix.findMany({
       where: { userId },
-      include: { cells: true },
     });
   },
 

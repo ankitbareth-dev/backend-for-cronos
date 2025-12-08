@@ -7,61 +7,58 @@ generator client {
   provider = "prisma-client-js" 
 } 
  
-model User { 
-  id         String        @id @default(uuid()) 
-  name       String 
-  email      String        @unique 
-  password   String 
-  createdAt  DateTime      @default(now()) 
- 
-  matrices   TimeMatrix[] 
-  categories Category[] 
-} 
- 
-model TimeMatrix { 
-  id          String        @id @default(uuid()) 
-  name        String 
-  startDate   DateTime 
-  endDate     DateTime 
-  startTime   String         
-  endTime     String         
-  interval    Int            
-  createdAt   DateTime      @default(now()) 
- 
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade) 
-  userId      String 
- 
-  cells       MatrixCell[] 
-  
+model User {
+  id         String        @id @default(uuid())
+  name       String
+  email      String        @unique
+  password   String
+  createdAt  DateTime      @default(now())
+
+  matrices   TimeMatrix[]
+}
+
+model TimeMatrix {
+  id          String        @id @default(uuid())
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  startTime   String
+  endTime     String
+  interval    Int
+  createdAt   DateTime      @default(now())
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+
+  cells       MatrixCell[]
+  categories  Category[]  
+
   @@index([userId])
-} 
- 
-model MatrixCell { 
-  id         String      @id @default(uuid()) 
-  dayIndex   Int          
-  startTime  String       
-  endTime    String       
- 
-  matrix     TimeMatrix  @relation(fields: [matrixId], references: [id], onDelete: Cascade) 
-  matrixId   String 
-  
-  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+model Category {
+  id        String      @id @default(uuid())
+  name      String
+  color     String
+  createdAt DateTime    @default(now())
+
+  matrix     TimeMatrix @relation(fields: [matrixId], references: [id], onDelete: Cascade)
+  matrixId   String
+
+  cells      MatrixCell[]
+}
+
+model MatrixCell {
+  id         String     @id @default(uuid())
+  date       DateTime   
+  time       String     
+
+  matrix     TimeMatrix @relation(fields: [matrixId], references: [id], onDelete: Cascade)
+  matrixId   String
+
+  category   Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categoryId String?
-  
+
   @@index([matrixId])
   @@index([categoryId])
-} 
- 
-model Category { 
-  id        String       @id @default(uuid()) 
-  name      String 
-  color     String      
-  createdAt DateTime     @default(now()) 
- 
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade) 
-  userId    String 
-  
-  cells     MatrixCell[]
-  
-  @@index([userId])
 }
