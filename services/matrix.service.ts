@@ -31,20 +31,22 @@ export const matrixService = {
         startTime: data.startTime,
         endTime: data.endTime,
         interval: data.interval,
-        userId,
+
+        // safer
+        user: { connect: { id: userId } },
       },
     });
   },
 
   update(userId: string, matrixId: string, name: string) {
-    return prisma.timeMatrix.update({
+    return prisma.timeMatrix.updateMany({
       where: { id: matrixId, userId },
       data: { name },
     });
   },
 
   delete(userId: string, matrixId: string) {
-    return prisma.timeMatrix.delete({
+    return prisma.timeMatrix.deleteMany({
       where: { id: matrixId, userId },
     });
   },

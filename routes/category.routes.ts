@@ -2,7 +2,6 @@ import { Router } from "express";
 import { protectedRoute } from "../middlewares/protectedRoute";
 import { validate } from "../middlewares/validate";
 import {
-  getCategoriesSchema,
   createCategorySchema,
   editCategorySchema,
   deleteCategorySchema,
@@ -10,13 +9,6 @@ import {
 import { CategoryController } from "../controllers/category.controller";
 
 const router = Router();
-
-router.get(
-  "/",
-  protectedRoute,
-  validate(getCategoriesSchema),
-  CategoryController.getCategories
-);
 
 router.post(
   "/create",

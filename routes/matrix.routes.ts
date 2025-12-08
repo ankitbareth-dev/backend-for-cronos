@@ -22,14 +22,14 @@ router.post(
 );
 
 router.put(
-  "/edit",
+  "/:matrixId",
   protectedRoute,
   validate(editMatrixSchema),
   MatrixController.editMatrix
 );
 
 router.delete(
-  "/delete",
+  "/:matrixId",
   protectedRoute,
   validate(deleteMatrixSchema),
   MatrixController.deleteMatrix

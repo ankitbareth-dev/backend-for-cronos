@@ -1,18 +1,6 @@
 import { prisma } from "../utils/prisma";
 
 export const cellService = {
-  getCells(matrixId: string, userId: string) {
-    return prisma.matrixCell.findMany({
-      where: {
-        matrixId,
-        matrix: { userId },
-      },
-      include: {
-        category: true,
-      },
-    });
-  },
-
   async saveCells(matrixId: string, userId: string, cells: any[]) {
     return prisma.$transaction(async (tx) => {
       const matrix = await tx.timeMatrix.findFirst({

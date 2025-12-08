@@ -1,36 +1,64 @@
 import { prisma } from "../utils/prisma";
 
 export const categoryService = {
-  getAll(userId: string) {
-    return prisma.category.findMany({
-      where: { userId },
-      include: { cells: true },
+  async create(userId: string, matrixId: string, data: any) {
+    // Verify matrix belongs to the user
+    const matrix = await prisma.timeMatrix.findFirst({
+      where: { id: matrixId, userId },
     });
-  },
 
-  create(userId: string, data: { name: string; color: string }) {
+    if (!matrix) throw new Error("Matrix not found or not owned by user");
+
     return prisma.category.create({
       data: {
-        ...data,
-        userId,
+        name: data.name,
+        color: data.color,
+        matrixId,
       },
     });
   },
 
-  update(
+  async update(
     userId: string,
+    matrixId: string,
     categoryId: string,
-    data: { name: string; color: string }
+    data: any
   ) {
-    return prisma.category.updateMany({
-      where: { id: categoryId, userId },
+    // Verify category exists and belongs to the user's matrix
+    const category = await prisma.category.findFirst({
+      where: { id: categoryId, matrixId },
+    });
+
+    // Verify matrix ownership
+    const matrix = await prisma.timeMatrix.findFirst({
+      where: { id: matrixId, userId },
+    });
+
+    if (!category || !matrix)
+      throw new Error("Category not found in this matrix or not owned by user");
+
+    return prisma.category.update({
+      where: { id: categoryId },
       data,
     });
   },
 
-  delete(userId: string, categoryId: string) {
-    return prisma.category.deleteMany({
-      where: { id: categoryId, userId },
+  async delete(userId: string, matrixId: string, categoryId: string) {
+    // Verify category exists and belongs to the user's matrix
+    const category = await prisma.category.findFirst({
+      where: { id: categoryId, matrixId },
+    });
+
+    // Verify matrix ownership
+    const matrix = await prisma.timeMatrix.findFirst({
+      where: { id: matrixId, userId },
+    });
+
+    if (!category || !matrix)
+      throw new Error("Category not found in this matrix or not owned by user");
+
+    return prisma.category.delete({
+      where: { id: categoryId },
     });
   },
 };
