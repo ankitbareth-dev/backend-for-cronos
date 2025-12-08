@@ -4,6 +4,21 @@ export const matrixService = {
   getAll(userId: string) {
     return prisma.timeMatrix.findMany({
       where: { userId },
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+      },
+    });
+  },
+
+  getFull(userId: string, matrixId: string) {
+    return prisma.timeMatrix.findFirst({
+      where: { id: matrixId, userId },
+      include: {
+        categories: true,
+        cells: true,
+      },
     });
   },
 
@@ -11,8 +26,8 @@ export const matrixService = {
     return prisma.timeMatrix.create({
       data: {
         name: data.name,
-        startDate: new Date(data.startDate).toISOString(),
-        endDate: new Date(data.endDate).toISOString(),
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
         startTime: data.startTime,
         endTime: data.endTime,
         interval: data.interval,

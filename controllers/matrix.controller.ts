@@ -4,13 +4,18 @@ import { matrixService } from "../services/matrix.service";
 export const MatrixController = {
   getUserMatrix: async (req: Request, res: Response) => {
     const userId = req.user!.id;
-
     const matrices = await matrixService.getAll(userId);
 
-    res.status(200).json({
-      success: true,
-      data: matrices,
-    });
+    res.status(200).json({ success: true, data: matrices });
+  },
+
+  getFullMatrix: async (req: Request, res: Response) => {
+    const userId = req.user!.id;
+    const matrixId = req.params.matrixId;
+
+    const matrix = await matrixService.getFull(userId, matrixId);
+
+    res.status(200).json({ success: true, data: matrix });
   },
 
   createMatrix: async (req: Request, res: Response) => {
@@ -18,10 +23,7 @@ export const MatrixController = {
 
     const matrix = await matrixService.create(userId, req.body);
 
-    res.status(201).json({
-      success: true,
-      data: matrix,
-    });
+    res.status(201).json({ success: true, data: matrix });
   },
 
   editMatrix: async (req: Request, res: Response) => {
@@ -30,10 +32,7 @@ export const MatrixController = {
 
     const updated = await matrixService.update(userId, matrixId, name);
 
-    res.status(200).json({
-      success: true,
-      data: updated,
-    });
+    res.status(200).json({ success: true, data: updated });
   },
 
   deleteMatrix: async (req: Request, res: Response) => {
@@ -42,9 +41,6 @@ export const MatrixController = {
 
     await matrixService.delete(userId, matrixId);
 
-    res.status(200).json({
-      success: true,
-      message: "Matrix deleted",
-    });
+    res.status(200).json({ success: true, message: "Matrix deleted" });
   },
 };

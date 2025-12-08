@@ -12,6 +12,8 @@ const router = Router();
 
 router.get("/", protectedRoute, MatrixController.getUserMatrix);
 
+router.get("/:matrixId/full", protectedRoute, MatrixController.getFullMatrix);
+
 router.post(
   "/create",
   protectedRoute,
