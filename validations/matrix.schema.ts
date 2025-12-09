@@ -14,14 +14,16 @@ export const createMatrixSchema = z.object({
 });
 
 export const editMatrixSchema = z.object({
+  params: z.object({
+    matrixId: z.uuid(),
+  }),
   body: z.object({
-    matrixId: z.uuid({ message: "Invalid matrixId" }),
-    name: z.string().min(1, "Name is required"),
+    name: z.string().min(1),
   }),
 });
 
 export const deleteMatrixSchema = z.object({
-  body: z.object({
+  params: z.object({
     matrixId: z.uuid({ message: "Invalid matrixId" }),
   }),
 });
