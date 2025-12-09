@@ -15,6 +15,7 @@ model User {
   createdAt  DateTime      @default(now())
 
   matrices   TimeMatrix[]
+  cells      MatrixCell[]
 }
 
 model TimeMatrix {
@@ -65,16 +66,21 @@ model Category {
   @@index([matrixId])
 }
 
+
 model MatrixCell {
   id           String      @id @default(uuid())
-  index        Int
+  index        Int         
   colorHex     String?
   createdAt    DateTime    @default(now())
 
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String      
 
   matrixData   MatrixData  @relation(fields: [matrixDataId], references: [id], onDelete: Cascade)
-  matrixDataId String
+  matrixDataId String      
 
   @@index([matrixDataId])
   @@index([index])
+  @@unique([matrixDataId, index, userId]) 
 }
+
