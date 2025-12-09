@@ -1,20 +1,31 @@
 import { prisma } from "../utils/prisma";
 
 export const categoryService = {
-  async create(userId: string, matrixId: string, data: any) {
-    // Verify matrix belongs to the user
+  async getAll(userId: string, matrixId: string) {
+    // Ensure matrix belongs to user
     const matrix = await prisma.timeMatrix.findFirst({
       where: { id: matrixId, userId },
     });
+    if (!matrix) throw new Error("Matrix not found or not owned by user");
 
+    return prisma.category.findMany({
+      where: { matrixId },
+      orderBy: { createdAt: "asc" },
+    });
+  },
+
+  async create(
+    userId: string,
+    matrixId: string,
+    data: { name: string; color: string }
+  ) {
+    const matrix = await prisma.timeMatrix.findFirst({
+      where: { id: matrixId, userId },
+    });
     if (!matrix) throw new Error("Matrix not found or not owned by user");
 
     return prisma.category.create({
-      data: {
-        name: data.name,
-        color: data.color,
-        matrixId,
-      },
+      data: { name: data.name, color: data.color, matrixId },
     });
   },
 
@@ -22,20 +33,17 @@ export const categoryService = {
     userId: string,
     matrixId: string,
     categoryId: string,
-    data: any
+    data: { name: string; color: string }
   ) {
-    // Verify category exists and belongs to the user's matrix
-    const category = await prisma.category.findFirst({
-      where: { id: categoryId, matrixId },
-    });
-
-    // Verify matrix ownership
     const matrix = await prisma.timeMatrix.findFirst({
       where: { id: matrixId, userId },
     });
+    if (!matrix) throw new Error("Matrix not found or not owned by user");
 
-    if (!category || !matrix)
-      throw new Error("Category not found in this matrix or not owned by user");
+    const category = await prisma.category.findFirst({
+      where: { id: categoryId, matrixId },
+    });
+    if (!category) throw new Error("Category not found in this matrix");
 
     return prisma.category.update({
       where: { id: categoryId },
@@ -44,21 +52,16 @@ export const categoryService = {
   },
 
   async delete(userId: string, matrixId: string, categoryId: string) {
-    // Verify category exists and belongs to the user's matrix
-    const category = await prisma.category.findFirst({
-      where: { id: categoryId, matrixId },
-    });
-
-    // Verify matrix ownership
     const matrix = await prisma.timeMatrix.findFirst({
       where: { id: matrixId, userId },
     });
+    if (!matrix) throw new Error("Matrix not found or not owned by user");
 
-    if (!category || !matrix)
-      throw new Error("Category not found in this matrix or not owned by user");
-
-    return prisma.category.delete({
-      where: { id: categoryId },
+    const category = await prisma.category.findFirst({
+      where: { id: categoryId, matrixId },
     });
+    if (!category) throw new Error("Category not found in this matrix");
+
+    return prisma.category.delete({ where: { id: categoryId } });
   },
 };

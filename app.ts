@@ -59,7 +59,7 @@ app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/matrix", matrixRoutes);
 app.use("/api/matrix-data/", matrixDataRoutes);
-app.use("/api/category", categoryRoutes);
+app.use("/api/categories", categoryRoutes);
 app.use("/api/cell", cellRoutes);
 
 app.use(unknownRouteHandler);
