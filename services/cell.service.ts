@@ -1,18 +1,49 @@
 import { prisma } from "../utils/prisma";
 
 export const cellService = {
+  // GET cells for a matrix for the logged-in user
+  async getCells(matrixId: string, userId: string) {
+    // Find matrix and its matrixData
+    const matrixData = await prisma.matrixData.findFirst({
+      where: {
+        matrixId,
+        matrix: { userId },
+      },
+      select: {
+        id: true,
+        cells: {
+          select: {
+            id: true,
+            index: true,
+            colorHex: true,
+          },
+        },
+      },
+    });
+
+    if (!matrixData) throw new Error("Matrix not found or not owned by user");
+
+    return matrixData.cells;
+  },
+
+  // Save/update cells for a matrix
   async saveCells(matrixId: string, userId: string, cells: any[]) {
     return prisma.$transaction(async (tx) => {
-      // 1. Verify matrix belongs to user
-      const matrix = await tx.timeMatrix.findFirst({
-        where: { id: matrixId, userId },
+      // 1. Find the matrixData for this matrix
+      const matrixData = await tx.matrixData.findFirst({
+        where: {
+          matrixId,
+          matrix: { userId },
+        },
       });
 
-      if (!matrix) throw new Error("Matrix not found or not owned by user");
+      if (!matrixData) throw new Error("Matrix not found or not owned by user");
 
-      // 2. Clear old cells
+      const matrixDataId = matrixData.id;
+
+      // 2. Delete old cells for this user + matrixData
       await tx.matrixCell.deleteMany({
-        where: { matrixId },
+        where: { matrixDataId, userId },
       });
 
       // 3. Insert new cells
@@ -21,7 +52,8 @@ export const cellService = {
           data: cells.map((c) => ({
             index: c.index,
             colorHex: c.colorHex,
-            matrixId,
+            matrixDataId,
+            userId,
           })),
         });
       }

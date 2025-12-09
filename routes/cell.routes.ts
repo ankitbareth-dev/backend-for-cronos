@@ -6,6 +6,10 @@ import { saveCellsSchema } from "../validations/cell.schema";
 
 const router = Router();
 
+// GET cells for a matrix
+router.get("/", protectedRoute, CellController.getCells);
+
+// POST save/update cells
 router.post(
   "/save",
   protectedRoute,
