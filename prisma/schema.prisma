@@ -18,22 +18,38 @@ model User {
 }
 
 model TimeMatrix {
-  id          String        @id @default(uuid())
-  name        String
-  startDate   DateTime
-  endDate     DateTime
-  startTime   String
-  endTime     String
-  interval    Int
-  createdAt   DateTime      @default(now())
+  id         String        @id @default(uuid())
+  name       String
+  createdAt  DateTime      @default(now())
 
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
+  
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
 
-  cells       MatrixCell[]
-  categories  Category[]  
+ 
+  matrixData MatrixData?
+
+
+  categories Category[]
 
   @@index([userId])
+}
+
+model MatrixData {
+  id        String      @id @default(uuid())
+  startDate DateTime
+  endDate   DateTime
+  startTime String
+  endTime   String
+  interval  Int
+  createdAt DateTime    @default(now())
+
+  
+  matrix    TimeMatrix  @relation(fields: [matrixId], references: [id], onDelete: Cascade)
+  matrixId  String      @unique
+
+  
+  cells     MatrixCell[]
 }
 
 model Category {
@@ -42,20 +58,23 @@ model Category {
   color     String
   createdAt DateTime    @default(now())
 
-  matrix     TimeMatrix @relation(fields: [matrixId], references: [id], onDelete: Cascade)
-  matrixId   String
+ 
+  matrix    TimeMatrix  @relation(fields: [matrixId], references: [id], onDelete: Cascade)
+  matrixId  String
+
+  @@index([matrixId])
 }
 
 model MatrixCell {
-  id         String     @id @default(uuid())
-  index      Int        
-  colorHex   String?   
+  id           String      @id @default(uuid())
+  index        Int
+  colorHex     String?
+  createdAt    DateTime    @default(now())
 
-  matrix     TimeMatrix @relation(fields: [matrixId], references: [id], onDelete: Cascade)
-  matrixId   String
 
-  createdAt  DateTime   @default(now())
+  matrixData   MatrixData  @relation(fields: [matrixDataId], references: [id], onDelete: Cascade)
+  matrixDataId String
 
-  @@index([matrixId])
+  @@index([matrixDataId])
   @@index([index])
 }

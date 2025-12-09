@@ -12,28 +12,24 @@ export const matrixService = {
     });
   },
 
-  getFull(userId: string, matrixId: string) {
-    return prisma.timeMatrix.findFirst({
-      where: { id: matrixId, userId },
-      include: {
-        categories: true,
-        cells: true,
-      },
-    });
-  },
-
   create(userId: string, data: any) {
     return prisma.timeMatrix.create({
       data: {
         name: data.name,
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
-        startTime: data.startTime,
-        endTime: data.endTime,
-        interval: data.interval,
+        userId,
 
-        // safer
-        user: { connect: { id: userId } },
+        matrixData: {
+          create: {
+            startDate: new Date(data.startDate),
+            endDate: new Date(data.endDate),
+            startTime: data.startTime,
+            endTime: data.endTime,
+            interval: data.interval,
+          },
+        },
+      },
+      include: {
+        matrixData: true,
       },
     });
   },
@@ -45,9 +41,25 @@ export const matrixService = {
     });
   },
 
-  delete(userId: string, matrixId: string) {
-    return prisma.timeMatrix.deleteMany({
-      where: { id: matrixId, userId },
+  async delete(userId: string, matrixId: string) {
+    return prisma.$transaction(async (tx) => {
+      const matrix = await tx.timeMatrix.findFirst({
+        where: { id: matrixId, userId },
+      });
+
+      if (!matrix) throw new Error("Matrix not found");
+
+      await tx.category.deleteMany({
+        where: { matrixId },
+      });
+
+      await tx.matrixData.deleteMany({
+        where: { matrixId },
+      });
+
+      await tx.timeMatrix.delete({
+        where: { id: matrixId },
+      });
     });
   },
 };

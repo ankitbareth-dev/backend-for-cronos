@@ -9,18 +9,8 @@ export const MatrixController = {
     res.status(200).json({ success: true, data: matrices });
   },
 
-  getFullMatrix: async (req: Request, res: Response) => {
-    const userId = req.user!.id;
-    const matrixId = req.params.matrixId;
-
-    const matrix = await matrixService.getFull(userId, matrixId);
-
-    res.status(200).json({ success: true, data: matrix });
-  },
-
   createMatrix: async (req: Request, res: Response) => {
     const userId = req.user!.id;
-
     const matrix = await matrixService.create(userId, req.body);
 
     res.status(201).json({ success: true, data: matrix });
@@ -28,7 +18,8 @@ export const MatrixController = {
 
   editMatrix: async (req: Request, res: Response) => {
     const userId = req.user!.id;
-    const { matrixId, name } = req.body;
+    const { matrixId } = req.params;
+    const { name } = req.body;
 
     const updated = await matrixService.update(userId, matrixId, name);
 
@@ -37,7 +28,7 @@ export const MatrixController = {
 
   deleteMatrix: async (req: Request, res: Response) => {
     const userId = req.user!.id;
-    const { matrixId } = req.body;
+    const { matrixId } = req.params; // <--- from params
 
     await matrixService.delete(userId, matrixId);
 
