@@ -26,10 +26,8 @@ export const cellService = {
     return matrixData.cells;
   },
 
-  // Save/update cells for a matrix
   async saveCells(matrixId: string, userId: string, cells: any[]) {
     return prisma.$transaction(async (tx) => {
-      // 1. Find the matrixData for this matrix
       const matrixData = await tx.matrixData.findFirst({
         where: {
           matrixId,
@@ -41,20 +39,25 @@ export const cellService = {
 
       const matrixDataId = matrixData.id;
 
-      // 2. Delete old cells for this user + matrixData
-      await tx.matrixCell.deleteMany({
-        where: { matrixDataId, userId },
-      });
-
-      // 3. Insert new cells
-      if (cells.length > 0) {
-        await tx.matrixCell.createMany({
-          data: cells.map((c) => ({
-            index: c.index,
-            colorHex: c.colorHex,
+      // UPSERT each cell (update if exists, else create)
+      for (const c of cells) {
+        await tx.matrixCell.upsert({
+          where: {
+            matrixDataId_index_userId: {
+              matrixDataId,
+              index: c.index,
+              userId,
+            },
+          },
+          update: {
+            colorHex: c.colorHex, // update existing cell
+          },
+          create: {
             matrixDataId,
             userId,
-          })),
+            index: c.index,
+            colorHex: c.colorHex,
+          },
         });
       }
 
