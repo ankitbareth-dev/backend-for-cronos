@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/globalErrorHandler";
 import { sanitizeInput } from "./middlewares/sanitizeInput";
 import { globalLimiter, authLimiter } from "./middlewares/rateLimiter";
-import { unknownRouteHandler } from "./utils/unknownRoutehandler";
+import { unknownRouteHandler } from "./utils/unknownRouteHandler";
 import { handleMalformedJson } from "./middlewares/handleMalformedJson";
 import { emptyBodyHandler } from "./middlewares/emptyBodyHandler";
 
@@ -42,7 +42,13 @@ app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
 app.use(cookieParser());
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(hpp());
 
 app.use(sanitizeInput);
