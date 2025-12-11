@@ -19,11 +19,13 @@ import matrixDataRoutes from "./routes/matrixData.routes";
 import cellRoutes from "./routes/cell.routes";
 import categoryRoutes from "./routes/category.routes";
 
+import { config } from "./config/env";
+
 const app: Application = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: config.server.clientUrl,
     credentials: true,
   })
 );
