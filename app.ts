@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import { errorHandler } from "./middlewares/globalErrorHandler";
 import { sanitizeInput } from "./middlewares/sanitizeInput";
 import { globalLimiter, authLimiter } from "./middlewares/rateLimiter";
-import { unknownRouteHandler } from "./utils/unknownRouteHandler";
+import { unknownRouteHandler } from "./middlewares/unknownRouteHandler";
 import { handleMalformedJson } from "./middlewares/handleMalformedJson";
 import { emptyBodyHandler } from "./middlewares/emptyBodyHandler";
 
@@ -32,7 +32,7 @@ app.use(
 
 app.disable("x-powered-by");
 
-if (process.env.NODE_ENV === "development") {
+if (config.env === "development") {
   app.use(morgan("dev"));
 }
 
@@ -59,7 +59,7 @@ app.use(sanitizeInput);
 
 app.use(globalLimiter);
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/health-check", (req: Request, res: Response) => {
   res.status(200).json({
     message: "Api is running",
   });
@@ -68,7 +68,7 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/matrix", matrixRoutes);
-app.use("/api/matrix-data/", matrixDataRoutes);
+app.use("/api/matrix-data", matrixDataRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/cell", cellRoutes);
 
