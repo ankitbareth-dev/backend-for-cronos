@@ -8,18 +8,26 @@ generator client {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  name          String?
-  avatarUrl     String?
-  googleId      String   @unique
+  id         String   @id @default(uuid())
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  email      String   @unique
+  name       String?
+  avatarUrl  String?
+
+  googleId   String   @unique
+  provider   AuthProvider @default(GOOGLE)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   matrices   TimeMatrix[]
   cells      MatrixCell[]
 }
+
+enum AuthProvider {
+  GOOGLE
+}
+
 
 model TimeMatrix {
   id         String        @id @default(uuid())

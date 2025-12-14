@@ -1,43 +1,74 @@
-import { prisma } from "../utils/prisma";
-import bcrypt from "bcrypt";
-import { config } from "../config/env";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+import { prisma } from "../utils/prisma";
 
-export const registerUser = async (
-  name: string,
-  email: string,
-  password: string
-) => {
-  const existingUser = await prisma.user.findUnique({ where: { email } });
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-  if (existingUser) {
-    throw new Error("User already exists");
+export const googleAuthService = async (idToken: string) => {
+  // 1. Verify Google ID token
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  if (!payload) {
+    const error: any = new Error("Invalid Google token");
+    error.status = 401;
+    throw error;
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const { sub: googleId, email, name, picture } = payload;
 
-  return prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-    },
+  if (!email) {
+    const error: any = new Error("Google account has no email");
+    error.status = 400;
+    throw error;
+  }
+
+  // 2. Single source of truth = email
+  let user = await prisma.user.findUnique({
+    where: { email },
   });
-};
 
-export const loginUser = async (email: string, password: string) => {
-  const user = await prisma.user.findUnique({ where: { email } });
+  // 3. Create user if not exists
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email,
+        name,
+        avatarUrl: picture,
+        googleId,
+      },
+    });
+  }
 
-  if (!user) throw new Error("Invalid credentials");
+  // 4. Link Google account if missing (edge case)
+  if (!user.googleId) {
+    user = await prisma.user.update({
+      where: { id: user.id },
+      data: { googleId },
+    });
+  }
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) throw new Error("Invalid credentials");
-
+  // 5. Issue JWT
   const token = jwt.sign(
-    { id: user.id, name: user.name, email: user.email },
-    config.jwt.secret,
+    {
+      id: user.id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET!,
     { expiresIn: "7d" }
   );
 
-  return { user, token };
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatarUrl: user.avatarUrl,
+    },
+    token,
+  };
 };
