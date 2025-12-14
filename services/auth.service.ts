@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
+import { config } from "../config/env";
 import { OAuth2Client } from "google-auth-library";
 import { prisma } from "../utils/prisma";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const googleAuthService = async (idToken: string) => {
-  // 1. Verify Google ID token
   const ticket = await googleClient.verifyIdToken({
     idToken,
     audience: process.env.GOOGLE_CLIENT_ID,
@@ -58,7 +58,7 @@ export const googleAuthService = async (idToken: string) => {
       id: user.id,
       email: user.email,
     },
-    process.env.JWT_SECRET!,
+    config.jwt.secret,
     { expiresIn: "7d" }
   );
 

@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { googleAuth, logout, checkAuth } from "../controllers/auth.controller";
 import { protectedRoute } from "../middlewares/protectedRoute";
-import { googleAuthSchema } from "validations/auth.schema";
-import { validate } from "middlewares/validate";
+import { googleAuthSchema } from "../validations/auth.schema";
+import { validate } from "../middlewares/validate";
 
 const router = Router();
 

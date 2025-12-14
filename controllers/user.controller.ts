@@ -4,15 +4,9 @@ import { catchAsync } from "../utils/catchAsync";
 
 export const updateUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!.id;
-  const { name, email, oldPassword, newPassword } = req.body;
+  const { name } = req.body;
 
-  const updatedUser = await userService.updateUser(
-    userId,
-    name,
-    email,
-    oldPassword,
-    newPassword
-  );
+  const updatedUser = await userService.updateUser(userId, name);
 
   res.status(200).json({
     success: true,
