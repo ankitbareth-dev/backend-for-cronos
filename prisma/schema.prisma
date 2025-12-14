@@ -8,11 +8,14 @@ generator client {
 }
 
 model User {
-  id         String        @id @default(uuid())
-  name       String
-  email      String        @unique
-  password   String
-  createdAt  DateTime      @default(now())
+  id            String   @id @default(uuid())
+  email         String   @unique
+  name          String?
+  avatarUrl     String?
+  googleId      String   @unique
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   matrices   TimeMatrix[]
   cells      MatrixCell[]
