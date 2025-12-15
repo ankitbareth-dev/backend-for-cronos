@@ -1,28 +1,35 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { AppError } from "../utils/AppError";
+import { config } from "../config/env";
+
+export interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+  };
+}
 
 export const protectedRoute = (
-  req: Request & { user?: any },
-  res: Response,
+  req: AuthRequest,
+  _res: Response,
   next: NextFunction
 ) => {
+  const token = req.cookies?.token;
+
+  if (!token) {
+    return next(new AppError("Authentication required", 401));
+  }
+
   try {
-    const token = req.cookies?.token;
-
-    if (!token) {
-      const error: any = new Error("Not authorized");
-      error.status = 401;
-      return next(error);
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    const decoded = jwt.verify(token, config.jwt.secret) as {
+      id: string;
+      email: string;
+    };
 
     req.user = decoded;
-
     next();
-  } catch (err) {
-    const error: any = new Error("Invalid or expired token");
-    error.status = 401;
-    return next(error);
+  } catch {
+    return next(new AppError("Invalid or expired token", 401));
   }
 };

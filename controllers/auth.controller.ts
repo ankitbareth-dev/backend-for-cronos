@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import { googleAuthService } from "../services/auth.service";
+import { AuthRequest } from "../middlewares/protectedRoute";
 
 export const googleAuth = catchAsync(async (req: Request, res: Response) => {
   const { idToken } = req.body;
@@ -16,28 +17,22 @@ export const googleAuth = catchAsync(async (req: Request, res: Response) => {
 
   res.status(200).json({
     success: true,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatarUrl,
-    },
+    user,
   });
 });
 
-export const checkAuth = (req: Request & { user?: any }, res: Response) => {
+export const checkAuth = (req: AuthRequest, res: Response) => {
   res.status(200).json({
     success: true,
     user: req.user,
   });
 };
 
-export const logout = (req: Request, res: Response) => {
+export const logout = (_req: AuthRequest, res: Response) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    path: "/",
   });
 
   res.status(200).json({

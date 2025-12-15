@@ -1,17 +1,23 @@
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "../utils/AppError";
 
-export function errorHandler(
+export const errorHandler = (
   err: any,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
-) {
-  console.error("Error:", err);
+  _next: NextFunction
+) => {
+  if (err instanceof AppError) {
+    return res.status(err.statusCode).json({
+      success: false,
+      message: err.message,
+    });
+  }
 
-  const status = err.status || err.statusCode || 400;
+  console.error("UNEXPECTED ERROR:", err);
 
-  return res.status(status).json({
+  res.status(500).json({
     success: false,
-    message: err.message || "Something went wrong",
+    message: "Something went wrong",
   });
-}
+};

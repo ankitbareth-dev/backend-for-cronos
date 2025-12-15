@@ -1,62 +1,51 @@
 import jwt from "jsonwebtoken";
-import { config } from "../config/env";
 import { OAuth2Client } from "google-auth-library";
 import { prisma } from "../utils/prisma";
+import { AppError } from "../utils/AppError";
+import { config } from "../config/env";
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const googleClient = new OAuth2Client(config.auth.google.clientId);
 
 export const googleAuthService = async (idToken: string) => {
   const ticket = await googleClient.verifyIdToken({
     idToken,
-    audience: process.env.GOOGLE_CLIENT_ID,
+    audience: config.auth.google.clientId,
   });
 
   const payload = ticket.getPayload();
 
   if (!payload) {
-    const error: any = new Error("Invalid Google token");
-    error.status = 401;
-    throw error;
+    throw new AppError("Invalid Google token", 401);
   }
 
   const { sub: googleId, email, name, picture } = payload;
 
-  if (!email) {
-    const error: any = new Error("Google account has no email");
-    error.status = 400;
-    throw error;
+  if (!googleId || !email) {
+    throw new AppError("Invalid Google account data", 400);
   }
 
-  // 2. Single source of truth = email
-  let user = await prisma.user.findUnique({
-    where: { email },
+  const user = await prisma.user.upsert({
+    where: {
+      email,
+    },
+    update: {
+      name,
+      avatarUrl: picture,
+      googleId,
+    },
+    create: {
+      email,
+      googleId,
+      name,
+      avatarUrl: picture,
+    },
   });
 
-  // 3. Create user if not exists
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        email,
-        name,
-        avatarUrl: picture,
-        googleId,
-      },
-    });
-  }
-
-  // 4. Link Google account if missing (edge case)
-  if (!user.googleId) {
-    user = await prisma.user.update({
-      where: { id: user.id },
-      data: { googleId },
-    });
-  }
-
-  // 5. Issue JWT
   const token = jwt.sign(
     {
-      id: user.id,
+      name: user.name,
       email: user.email,
+      avatarUrl: user.avatarUrl,
     },
     config.jwt.secret,
     { expiresIn: "7d" }

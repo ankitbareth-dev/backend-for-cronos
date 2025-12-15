@@ -34,6 +34,11 @@ export const config = {
     secret: requireEnv("JWT_SECRET"),
     expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   },
+  auth: {
+    google: {
+      clientId: requireEnv("GOOGLE_CLIENT_ID"),
+    },
+  },
 } as const;
 
 Object.freeze(config);
