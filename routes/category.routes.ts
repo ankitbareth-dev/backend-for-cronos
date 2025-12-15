@@ -11,31 +11,28 @@ import {
 
 const router = Router();
 
-// Get all categories for a matrix
+router.use(protectedRoute);
+
 router.get(
   "/:matrixId",
-  protectedRoute,
   validate(getCategoriesSchema),
   CategoryController.getCategories
 );
 
 router.post(
-  "/create",
-  protectedRoute,
+  "/:matrixId",
   validate(createCategorySchema),
   CategoryController.createCategory
 );
 
 router.put(
-  "/edit",
-  protectedRoute,
+  "/:matrixId/:categoryId",
   validate(editCategorySchema),
   CategoryController.editCategory
 );
 
 router.delete(
-  "/delete",
-  protectedRoute,
+  "/:matrixId/:categoryId",
   validate(deleteCategorySchema),
   CategoryController.deleteCategory
 );
