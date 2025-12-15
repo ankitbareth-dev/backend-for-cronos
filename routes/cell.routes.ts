@@ -2,17 +2,14 @@ import { Router } from "express";
 import { protectedRoute } from "../middlewares/protectedRoute";
 import { validate } from "../middlewares/validate";
 import { CellController } from "../controllers/cell.controller";
-import { saveCellsSchema } from "../validations/cell.schema";
+import { getCellsSchema, saveCellsSchema } from "../validations/cell.schema";
 
 const router = Router();
 
-router.get("/", protectedRoute, CellController.getCells);
+router.use(protectedRoute);
 
-router.post(
-  "/save",
-  protectedRoute,
-  validate(saveCellsSchema),
-  CellController.saveCells
-);
+router.get("/:matrixId", validate(getCellsSchema), CellController.getCells);
+
+router.put("/:matrixId", validate(saveCellsSchema), CellController.saveCells);
 
 export default router;

@@ -1,67 +1,98 @@
 import { prisma } from "../utils/prisma";
+import { AppError } from "../utils/AppError";
+
+interface CellInput {
+  index: number;
+  colorHex: string | null;
+}
 
 export const cellService = {
-  // GET cells for a matrix for the logged-in user
-  async getCells(matrixId: string, userId: string) {
-    // Find matrix and its matrixData
+  async getCells(userId: string, matrixId: string) {
     const matrixData = await prisma.matrixData.findFirst({
       where: {
         matrixId,
         matrix: { userId },
       },
       select: {
-        id: true,
         cells: {
           select: {
-            id: true,
             index: true,
             colorHex: true,
           },
+          orderBy: { index: "asc" },
         },
       },
     });
 
-    if (!matrixData) throw new Error("Matrix not found or not owned by user");
+    if (!matrixData) {
+      throw new AppError("Matrix not found", 404);
+    }
 
     return matrixData.cells;
   },
 
-  async saveCells(matrixId: string, userId: string, cells: any[]) {
+  async saveCells(userId: string, matrixId: string, cells: CellInput[]) {
     return prisma.$transaction(async (tx) => {
       const matrixData = await tx.matrixData.findFirst({
         where: {
           matrixId,
           matrix: { userId },
         },
+        select: { id: true },
       });
 
-      if (!matrixData) throw new Error("Matrix not found or not owned by user");
+      if (!matrixData) {
+        throw new AppError("Matrix not found", 404);
+      }
 
       const matrixDataId = matrixData.id;
 
-      // UPSERT each cell (update if exists, else create)
-      for (const c of cells) {
-        await tx.matrixCell.upsert({
-          where: {
-            matrixDataId_index_userId: {
-              matrixDataId,
-              index: c.index,
-              userId,
-            },
-          },
-          update: {
-            colorHex: c.colorHex, // update existing cell
-          },
-          create: {
-            matrixDataId,
-            userId,
-            index: c.index,
-            colorHex: c.colorHex,
-          },
+      // Existing cells
+      const existingCells = await tx.matrixCell.findMany({
+        where: {
+          matrixDataId,
+          userId,
+          index: { in: cells.map((c) => c.index) },
+        },
+        select: {
+          id: true,
+          index: true,
+        },
+      });
+
+      const existingIndexes = new Set(existingCells.map((c) => c.index));
+
+      const toCreate = cells
+        .filter((c) => !existingIndexes.has(c.index))
+        .map((c) => ({
+          matrixDataId,
+          userId,
+          index: c.index,
+          colorHex: c.colorHex,
+        }));
+
+      // 🔹 Bulk create
+      if (toCreate.length > 0) {
+        await tx.matrixCell.createMany({
+          data: toCreate,
         });
       }
 
-      return true;
+      // 🔹 Bulk update (one by one but minimal)
+      await Promise.all(
+        cells
+          .filter((c) => existingIndexes.has(c.index))
+          .map((c) =>
+            tx.matrixCell.updateMany({
+              where: {
+                matrixDataId,
+                userId,
+                index: c.index,
+              },
+              data: { colorHex: c.colorHex },
+            })
+          )
+      );
     });
   },
 };

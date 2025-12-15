@@ -1,25 +1,30 @@
 import { Request, Response } from "express";
+import { catchAsync } from "../utils/catchAsync";
 import { cellService } from "../services/cell.service";
 
 export const CellController = {
-  getCells: async (req: Request, res: Response) => {
+  getCells: catchAsync(async (req: Request, res: Response) => {
     const userId = req.user!.id;
-    const { matrixId } = req.query as { matrixId: string };
+    const { matrixId } = req.params;
 
-    const cells = await cellService.getCells(matrixId, userId);
-
-    res.status(200).json({ success: true, data: cells });
-  },
-
-  saveCells: async (req: Request, res: Response) => {
-    const userId = req.user!.id;
-    const { matrixId, cells } = req.body;
-
-    await cellService.saveCells(matrixId, userId, cells);
+    const cells = await cellService.getCells(userId, matrixId);
 
     res.status(200).json({
       success: true,
-      message: "Cells updated",
+      data: cells,
     });
-  },
+  }),
+
+  saveCells: catchAsync(async (req: Request, res: Response) => {
+    const userId = req.user!.id;
+    const { matrixId } = req.params;
+    const { cells } = req.body;
+
+    await cellService.saveCells(userId, matrixId, cells);
+
+    res.status(200).json({
+      success: true,
+      message: "Cells updated successfully",
+    });
+  }),
 };
