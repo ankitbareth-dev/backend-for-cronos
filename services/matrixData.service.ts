@@ -1,9 +1,13 @@
 import { prisma } from "../utils/prisma";
+import { AppError } from "../utils/AppError";
 
 export const matrixDataService = {
   async getByMatrixId(userId: string, matrixId: string) {
     const matrix = await prisma.timeMatrix.findFirst({
-      where: { id: matrixId, userId },
+      where: {
+        id: matrixId,
+        userId,
+      },
       select: {
         matrixData: {
           select: {
@@ -19,6 +23,10 @@ export const matrixDataService = {
       },
     });
 
-    return matrix?.matrixData || null;
+    if (!matrix || !matrix.matrixData) {
+      throw new AppError("Matrix data not found", 404);
+    }
+
+    return matrix.matrixData;
   },
 };

@@ -6,11 +6,12 @@ import { getMatrixDataSchema } from "../validations/matrixData.schema";
 
 const router = Router();
 
+router.use(protectedRoute);
+
 router.get(
   "/:matrixId",
-  protectedRoute,
   validate(getMatrixDataSchema),
-  MatrixDataController.getMatrixData
+  MatrixDataController.getByMatrixId
 );
 
 export default router;
