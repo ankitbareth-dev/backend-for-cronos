@@ -8,9 +8,9 @@ import { upload } from "../middlewares/upload";
 const router = Router();
 
 router.patch(
-  "/update",
+  "/me",
   protectedRoute,
-  upload.single("avatar"),
+  upload,
   validate(updateUserSchema),
   updateUser
 );
