@@ -10,25 +10,20 @@ import {
 
 const router = Router();
 
-router.get("/", protectedRoute, MatrixController.getUserMatrix);
+router.use(protectedRoute);
 
-router.post(
-  "/create",
-  protectedRoute,
-  validate(createMatrixSchema),
-  MatrixController.createMatrix
-);
+router.get("/", MatrixController.getUserMatrices);
+
+router.post("/", validate(createMatrixSchema), MatrixController.createMatrix);
 
 router.put(
   "/:matrixId",
-  protectedRoute,
   validate(editMatrixSchema),
   MatrixController.editMatrix
 );
 
 router.delete(
   "/:matrixId",
-  protectedRoute,
   validate(deleteMatrixSchema),
   MatrixController.deleteMatrix
 );
