@@ -1,50 +1,35 @@
-# ----------------------------
-# Stage 1: Build stage
-# ----------------------------
-FROM node:24-bullseye AS builder
-
-# Set working directory inside container
+FROM node:24-slim AS builder
 WORKDIR /app
 
-# Copy package.json and package-lock.json first (for caching)
+# Install OS packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl ca-certificates bash && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY package.json package-lock.json ./
-
-# Install all dependencies (including dev for TypeScript)
 RUN npm ci
-
-# Copy entire source code
 COPY . .
-
-# Build TypeScript
+RUN npx prisma generate
 RUN npm run build
 
-# Generate Prisma client (needed for production)
-RUN npx prisma generate
 
-
-# ----------------------------
-# Stage 2: Runtime stage
-# ----------------------------
-FROM node:24-bullseye-slim AS runtime
-
-# Set working directory
+FROM node:24-slim
 WORKDIR /app
 
-# Copy only production dependencies from builder
-COPY --from=builder /app/node_modules ./node_modules
+# Install runtime OS packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl ca-certificates bash && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy compiled JS and Prisma client
+ENV NODE_ENV=production
+RUN addgroup --system app && adduser --system --ingroup app app
+
+COPY --from=builder /app/package.json /app/package-lock.json ./
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 
-# Copy any other files you need (like package.json for version)
-COPY package.json ./
-
-# Expose the port (match your config)
+RUN npm prune --omit=dev
+USER app
 EXPOSE 5000
-
-# Set environment variable for Node
-ENV NODE_ENV=production
-
-# Start the server
 CMD ["node", "dist/server.js"]
