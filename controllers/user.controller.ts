@@ -4,7 +4,6 @@ import * as userService from "../services/user.service";
 
 export const updateUser = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!.id;
-
   const updatedUser = await userService.updateUserProfile({
     userId,
     name: req.body.name,
