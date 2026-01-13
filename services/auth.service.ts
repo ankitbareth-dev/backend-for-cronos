@@ -26,8 +26,6 @@ export const googleAuthService = async (token: string) => {
         email,
       },
       update: {
-        name,
-        avatarUrl: picture,
         googleId,
       },
       create: {
@@ -41,8 +39,6 @@ export const googleAuthService = async (token: string) => {
     const jwtToken = jwt.sign(
       {
         id: user.id,
-        name: user.name,
-        email: user.email,
       },
       config.jwt.secret,
       { expiresIn: "7d" }
@@ -65,4 +61,21 @@ export const googleAuthService = async (token: string) => {
     }
     throw new AppError("Internal server error during authentication", 500);
   }
+};
+export const getAuthenticatedUserService = async (userId: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      avatarUrl: true,
+    },
+  });
+
+  if (!user) {
+    throw new AppError("User not found", 401);
+  }
+
+  return user;
 };

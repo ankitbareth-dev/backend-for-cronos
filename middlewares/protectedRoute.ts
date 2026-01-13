@@ -24,10 +24,9 @@ export const protectedRoute = (
   try {
     const decoded = jwt.verify(token, config.jwt.secret) as {
       id: string;
-      email: string;
     };
 
-    req.user = decoded;
+    req.user = { id: decoded.id, email: "" };
     next();
   } catch {
     return next(new AppError("Invalid or expired token", 401));

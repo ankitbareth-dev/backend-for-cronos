@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
-import { googleAuthService } from "../services/auth.service";
+import {
+  getAuthenticatedUserService,
+  googleAuthService,
+} from "../services/auth.service";
 import { AuthRequest } from "../middlewares/protectedRoute";
 
 export const googleAuth = catchAsync(async (req: Request, res: Response) => {
@@ -21,12 +24,21 @@ export const googleAuth = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const checkAuth = (req: AuthRequest, res: Response) => {
+export const checkAuth = catchAsync(async (req: AuthRequest, res: Response) => {
+  if (!req.user?.id) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+
+  const user = await getAuthenticatedUserService(req.user.id);
+
   res.status(200).json({
     success: true,
-    user: req.user,
+    user,
   });
-};
+});
 
 export const logout = (_req: AuthRequest, res: Response) => {
   res.clearCookie("token", {
