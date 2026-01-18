@@ -48,13 +48,7 @@ app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
 app.use(cookieParser());
 
-app.use(
-  helmet({
-    contentSecurityPolicy: false,
-    crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  }),
-);
+app.use(helmet());
 app.use(hpp());
 
 app.use(sanitizeInput);
