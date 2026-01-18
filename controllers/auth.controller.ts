@@ -14,7 +14,7 @@ export const googleAuth = catchAsync(async (req: Request, res: Response) => {
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -44,7 +44,7 @@ export const logout = (_req: AuthRequest, res: Response) => {
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "none",
   });
 
   res.status(200).json({
