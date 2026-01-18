@@ -23,6 +23,8 @@ import { config } from "./config/env";
 
 const app: Application = express();
 
+app.set("trust proxy", true);
+
 app.use(
   cors({
     origin: "https://chronos-app-rose.vercel.app",
