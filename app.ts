@@ -22,12 +22,40 @@ import categoryRoutes from "./routes/category.routes";
 import { config } from "./config/env";
 
 const app: Application = express();
+app.use((req, res, next) => {
+  console.log("=== DEBUG LOG ===");
+  console.log(`Method: ${req.method}`);
+  console.log(`URL: ${req.url}`);
+  console.log(`Origin Header: ${req.headers.origin}`);
+  console.log("===========");
+
+  next();
+});
 
 app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: "https://chronos-app-rose.vercel.app",
+    origin: (origin, callback) => {
+      // Log what the server is checking
+      console.log(`[CORS CHECK] Origin received: ${origin}`);
+      console.log(
+        `[CORS CHECK] Allowed origin: https://chronos-app-rose.vercel.app`,
+      );
+
+      // Allow requests with no origin (like mobile apps, curl, or Postman)
+      if (!origin) return callback(null, true);
+
+      // Check if it matches your frontend
+      if (origin === "https://chronos-app-rose.vercel.app") {
+        console.log("[CORS CHECK] ✅ SUCCESS: Origin allowed.");
+        callback(null, true);
+      } else {
+        console.log("[CORS CHECK] ❌ FAILED: Origin blocked.");
+        // Block the request explicitly
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
