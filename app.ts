@@ -25,9 +25,9 @@ const app: Application = express();
 
 app.use(
   cors({
-    origin: config.server.clientUrl,
+    origin: "https://chronos-app-rose.vercel.app",
     credentials: true,
-  })
+  }),
 );
 
 app.disable("x-powered-by");
@@ -51,7 +51,7 @@ app.use(
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
     crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
+  }),
 );
 app.use(hpp());
 
