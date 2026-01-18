@@ -23,7 +23,7 @@ import { config } from "./config/env";
 
 const app: Application = express();
 
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 app.use(
   cors({

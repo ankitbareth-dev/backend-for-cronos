@@ -8,9 +8,8 @@ const rateLimitHandler: RateLimitExceededEventHandler = (
   req: Request,
   res: Response,
   next: NextFunction,
-  optionsUsed: Options
+  optionsUsed: Options,
 ) => {
-  // Correct way to access rate-limit info:
   const statusCode = req.rateLimit?.statusCode || 429;
 
   return res.status(statusCode).json({
