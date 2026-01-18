@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "outDir": "./dist",
+    "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
@@ -19,6 +20,6 @@
 
     "typeRoots": ["./types", "./node_modules/@types"]
   },
-  "include": ["./"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
