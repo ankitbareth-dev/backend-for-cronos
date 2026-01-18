@@ -21,11 +21,12 @@ export const matrixService = {
         userId,
         matrixData: {
           create: {
-            startDate: data.startDate,
-            endDate: data.endDate,
+            startDate: new Date(data.startDate),
+            endDate: new Date(data.endDate),
+
             startTime: data.startTime,
             endTime: data.endTime,
-            interval: data.interval,
+            interval: parseInt(data.interval, 10),
           },
         },
       },
@@ -58,7 +59,6 @@ export const matrixService = {
     });
   },
 
-  // ✅ Transactional delete
   async delete(userId: string, matrixId: string) {
     return prisma.$transaction(async (tx) => {
       const matrix = await tx.timeMatrix.findFirst({
