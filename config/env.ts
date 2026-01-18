@@ -12,7 +12,7 @@ function requireEnv(name: string): string {
   const value = process.env[name];
   if (!value) {
     throw new Error(
-      `❌ Missing required environment variable: ${name}. Check your ${envFile}`
+      `❌ Missing required environment variable: ${name}. Check your ${envFile}`,
     );
   }
   return value;
@@ -22,7 +22,6 @@ export const config = {
   env: requireEnv("NODE_ENV"),
 
   server: {
-    port: parseInt(requireEnv("PORT"), 10),
     clientUrl: requireEnv("CLIENT_URL"),
   },
 
