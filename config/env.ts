@@ -23,6 +23,7 @@ export const config = {
 
   server: {
     clientUrl: requireEnv("CLIENT_URL"),
+    port: parseInt(requireEnv("PORT")),
   },
 
   db: {

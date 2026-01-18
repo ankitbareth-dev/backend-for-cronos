@@ -1,9 +1,9 @@
 import app from "./app";
-//import { config } from "./config/env";
+import { config } from "./config/env";
 
-//const PORT: number = config.server.port;
+const PORT: number = config.server.port;
 
-//app.listen(PORT, () => {
-//  console.log(`server is running on http://localhost:${PORT}/health-check`);
-//});
+app.listen(PORT, () => {
+  console.log(`server is running on http://localhost:${PORT}/health-check`);
+});
 export default app;
