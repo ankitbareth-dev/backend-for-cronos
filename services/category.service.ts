@@ -27,7 +27,7 @@ export const categoryService = {
   async create(
     userId: string,
     matrixId: string,
-    data: { name: string; color: string }
+    data: { name: string; color: string },
   ) {
     const matrix = await prisma.timeMatrix.findFirst({
       where: { id: matrixId, userId },
@@ -56,7 +56,7 @@ export const categoryService = {
     userId: string,
     matrixId: string,
     categoryId: string,
-    data: { name: string; color: string }
+    data: { name: string; color: string },
   ) {
     const category = await prisma.category.findFirst({
       where: {

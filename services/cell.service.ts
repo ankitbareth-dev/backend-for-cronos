@@ -47,7 +47,21 @@ export const cellService = {
 
       const matrixDataId = matrixData.id;
 
-      // Existing cells
+      const categories = await tx.category.findMany({
+        where: { matrixId },
+        select: { id: true, color: true },
+      });
+
+      const colorToIdMap = new Map<string, string>();
+      categories.forEach((cat) => {
+        colorToIdMap.set(cat.color, cat.id);
+      });
+
+      const getCategoryId = (colorHex: string | null) => {
+        if (!colorHex) return null;
+        return colorToIdMap.get(colorHex) || null;
+      };
+
       const existingCells = await tx.matrixCell.findMany({
         where: {
           matrixDataId,
@@ -69,16 +83,16 @@ export const cellService = {
           userId,
           index: c.index,
           colorHex: c.colorHex,
+
+          categoryId: getCategoryId(c.colorHex),
         }));
 
-      // 🔹 Bulk create
       if (toCreate.length > 0) {
         await tx.matrixCell.createMany({
           data: toCreate,
         });
       }
 
-      // 🔹 Bulk update (one by one but minimal)
       await Promise.all(
         cells
           .filter((c) => existingIndexes.has(c.index))
@@ -89,9 +103,12 @@ export const cellService = {
                 userId,
                 index: c.index,
               },
-              data: { colorHex: c.colorHex },
-            })
-          )
+              data: {
+                colorHex: c.colorHex,
+                categoryId: getCategoryId(c.colorHex),
+              },
+            }),
+          ),
       );
     });
   },

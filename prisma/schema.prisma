@@ -74,6 +74,8 @@ model Category {
   matrix    TimeMatrix  @relation(fields: [matrixId], references: [id], onDelete: Cascade)
   matrixId  String
 
+  cells     MatrixCell[] 
+
   @@index([matrixId])
 }
 
@@ -88,9 +90,13 @@ model MatrixCell {
   userId       String      
 
   matrixData   MatrixData  @relation(fields: [matrixDataId], references: [id], onDelete: Cascade)
-  matrixDataId String      
+  matrixDataId String    
+
+  categoryId   String?
+  category     Category?   @relation(fields: [categoryId], references: [id], onDelete: Cascade)  
 
   @@index([matrixDataId])
+  @@index([categoryId])
   @@index([index])
   @@unique([matrixDataId, index, userId]) 
 }
