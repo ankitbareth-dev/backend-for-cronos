@@ -20,7 +20,7 @@ import cellRoutes from "./routes/cell.routes";
 import categoryRoutes from "./routes/category.routes";
 
 import { config } from "./config/env";
-import { prisma } from "utils/prisma";
+import { prisma } from "./utils/prisma";
 
 const app: Application = express();
 
