@@ -20,6 +20,7 @@ import cellRoutes from "./routes/cell.routes";
 import categoryRoutes from "./routes/category.routes";
 
 import { config } from "./config/env";
+import { prisma } from "utils/prisma";
 
 const app: Application = express();
 
@@ -55,10 +56,13 @@ app.use(sanitizeInput);
 
 app.use(globalLimiter);
 
-app.get("/health-check", (_req: Request, res: Response) => {
-  res.status(200).json({
-    message: "Api is running",
-  });
+app.get("/health-check", async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({ status: "ok", db: "connected" });
+  } catch (error) {
+    res.status(500).json({ status: "error", db: "disconnected" });
+  }
 });
 
 app.use("/api/auth", authLimiter, authRoutes);
